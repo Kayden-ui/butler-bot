@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const crypto = require('crypto');
+const fs = require('fs');
 const {
     Client,
     GatewayIntentBits,
@@ -21,8 +22,36 @@ const client = new Client({
 // ================= DATA =================
 
 const games = {};
-const playerStats = {};
+let playerStats = {};
 
+if (
+    fs.existsSync(
+        './leaderboard.json'
+    )
+) {
+
+    playerStats = JSON.parse(
+
+        fs.readFileSync(
+            './leaderboard.json',
+            'utf8'
+        )
+    );
+}
+// ================= LEADERBOARD SAVE =================
+function saveLeaderboard() {
+
+    fs.writeFileSync(
+
+        './leaderboard.json',
+
+        JSON.stringify(
+            playerStats,
+            null,
+            2
+        )
+    );
+}
 // ================= BUTTONS =================
 
 function createNumberButtons() {
@@ -751,6 +780,7 @@ if (
                     playerStats[
                         game.player2
                     ].losses++;
+                    saveLeaderboard();
 
                     result +=
                         `<@${game.player1}> wins!`;
@@ -765,6 +795,7 @@ if (
                     playerStats[
                         game.player1
                     ].losses++;
+                    saveLeaderboard();
 
                     result +=
                         `<@${game.player2}> wins!`;
@@ -779,6 +810,7 @@ if (
                     playerStats[
                         game.player2
                     ].draws++;
+                    saveLeaderboard();
 
                     result +=
                         '🤝 Match Draw!';
@@ -905,7 +937,7 @@ if (
                 playerStats[
                     loser
                 ].losses++;
-                  
+                saveLeaderboard();
                     
                     delete games[channelId];
 
